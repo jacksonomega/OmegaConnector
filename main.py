@@ -23,7 +23,7 @@ CONFIG = {
     "OLLAMA_URL": "http://localhost:11434/api/chat",
     "HOST": "127.0.0.1",
     "PORT": 5123,
-    "ORIGINS": ["https://omega-knowledge.vercel.app", "http://localhost:4200"]
+    "ORIGINS": ["https://omega-knowledge.dev", "https://www.omega-knowledge.dev", "http://localhost:4200"]
 }
 
 
