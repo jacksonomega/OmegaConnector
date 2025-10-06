@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omega Bridge - Web Integration Example</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        select, textarea, input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, textarea:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .response-box {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .status.online {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.offline {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status.loading {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .settings {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Omega Bridge</h1>
+            <p>Integración con LLM Local</p>
+        </div>
+
+        <div class="content">
+            <div class="settings">
+                <div class="input-group">
+                    <label for="serverUrl">🔗 URL del Servidor</label>
+                    <input type="text" id="serverUrl" value="http://localhost:8000" placeholder="http://localhost:8000">
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="streamMode" checked>
+                    <label for="streamMode" style="margin-bottom: 0;">Modo Streaming (respuesta en tiempo real)</label>
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <span id="serverStatus" class="status offline">⚠️ Desconectado</span>
+                    <button onclick="checkServerStatus()" style="width: auto; padding: 4px 12px; font-size: 12px; margin-left: 10px;">
+                        Verificar Conexión
+                    </button>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="modelSelect">🤖 Modelo LLM</label>
+                <select id="modelSelect">
+                    <option value="llama3.2:3b">Llama 3.2 (3B)</option>
+                    <option value="llama3.2:1b">Llama 3.2 (1B)</option>
+                    <option value="llama3.1:8b">Llama 3.1 (8B)</option>
+                    <option value="mistral:7b">Mistral (7B)</option>
+                    <option value="phi3:mini">Phi 3 Mini</option>
+                    <option value="gemma2:2b">Gemma 2 (2B)</option>
+                    <option value="qwen2.5:7b">Qwen 2.5 (7B)</option>
+                    <option value="codellama:7b">CodeLlama (7B)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="promptInput">💬 Tu Pregunta</label>
+                <textarea id="promptInput" placeholder="Escribe tu pregunta aquí...">¿Qué es la inteligencia artificial?</textarea>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-primary" onclick="sendQuestion()" id="sendBtn">
+                    ✨ Enviar Pregunta
+                </button>
+                <button class="btn-secondary" onclick="clearResponse()" id="clearBtn">
+                    🗑️ Limpiar
+                </button>
+            </div>
+
+            <div class="input-group">
+                <label>📝 Respuesta del Modelo</label>
+                <div id="responseBox" class="response-box">Las respuestas aparecerán aquí...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isGenerating = false;
+
+        // Verificar estado del servidor
+        async function checkServerStatus() {
+            const serverUrl = document.getElementById('serverUrl').value;
+            const statusEl = document.getElementById('serverStatus');
+
+            try {
+                const response = await fetch(`${serverUrl}/`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    statusEl.className = 'status online';
+                    statusEl.textContent = '✅ Conectado';
+
+                    // Obtener modelos disponibles
+                    const modelsResponse = await fetch(`${serverUrl}/models`);
+                    if (modelsResponse.ok) {
+                        const modelsData = await modelsResponse.json();
+                        console.log('Modelos instalados:', modelsData.installed_models);
+                    }
+                } else {
+                    statusEl.className = 'status offline';
+                    statusEl.textContent = '⚠️ Error de conexión';
+                }
+            } catch (error) {
+                statusEl.className = 'status offline';
+                statusEl.textContent = '❌ Servidor no disponible';
+                console.error('Error:', error);
+            }
+        }
+
+        // Enviar pregunta con streaming
+        async function sendQuestionStreaming(serverUrl, model, prompt) {
+            const responseBox = document.getElementById('responseBox');
+            responseBox.textContent = '';
+
+            try {
+                const response = await fetch(`${serverUrl}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: model,
+                        prompt: prompt,
+                        stream: true
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value);
+                    const lines = chunk.split('\n');
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6);
+                            if (data === '[DONE]') {
+                                console.log('Streaming completado');
+                                return;
+                            }
+
+                            try {
+                                const parsed = JSON.parse(data);
+                                responseBox.textContent += parsed.chunk;
+                                responseBox.scrollTop = responseBox.scrollHeight;
+                            } catch (e) {
+                                // Ignorar líneas malformadas
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                responseBox.textContent = `Error: ${error.message}\n\nAsegúrate de que:\n1. El servidor Omega Bridge esté ejecutándose\n2. Ollama esté instalado y corriendo\n3. El modelo seleccionado esté descargado`;
+                throw error;
+            }
+        }
+
+        // Enviar pregunta sin streaming
+        async function sendQuestionNoStream(serverUrl, model, prompt) {
+            const responseBox = document.getElementById('responseBox');
+
+            try {
+                const response = await fetch(`${serverUrl}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: model,
+                        prompt: prompt,
+                        stream: false
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                responseBox.textContent = data.response;
+            } catch (error) {
+                responseBox.textContent = `Error: ${error.message}\n\nAsegúrate de que:\n1. El servidor Omega Bridge esté ejecutándose\n2. Ollama esté instalado y corriendo\n3. El modelo seleccionado esté descargado`;
+                throw error;
+            }
+        }
+
+        // Función principal para enviar pregunta
+        async function sendQuestion() {
+            if (isGenerating) return;
+
+            const serverUrl = document.getElementById('serverUrl').value;
+            const model = document.getElementById('modelSelect').value;
+            const prompt = document.getElementById('promptInput').value.trim();
+            const streamMode = document.getElementById('streamMode').checked;
+            const sendBtn = document.getElementById('sendBtn');
+            const responseBox = document.getElementById('responseBox');
+            const statusEl = document.getElementById('serverStatus');
+
+            if (!prompt) {
+                alert('Por favor escribe una pregunta');
+                return;
+            }
+
+            isGenerating = true;
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<span class="spinner"></span> Generando...';
+            statusEl.className = 'status loading';
+            statusEl.textContent = '⏳ Procesando...';
+            responseBox.textContent = 'Esperando respuesta...';
+
+            try {
+                if (streamMode) {
+                    await sendQuestionStreaming(serverUrl, model, prompt);
+                } else {
+                    await sendQuestionNoStream(serverUrl, model, prompt);
+                }
+
+                statusEl.className = 'status online';
+                statusEl.textContent = '✅ Completado';
+            } catch (error) {
+                console.error('Error:', error);
+                statusEl.className = 'status offline';
+                statusEl.textContent = '❌ Error';
+            } finally {
+                isGenerating = false;
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = '✨ Enviar Pregunta';
+            }
+        }
+
+        // Limpiar respuesta
+        function clearResponse() {
+            document.getElementById('responseBox').textContent = 'Las respuestas aparecerán aquí...';
+            document.getElementById('promptInput').value = '';
+        }
+
+        // Permitir enviar con Enter (Ctrl+Enter)
+        document.getElementById('promptInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                sendQuestion();
+            }
+        });
+
+        // Verificar conexión al cargar
+        window.addEventListener('load', function() {
+            setTimeout(checkServerStatus, 500);
+        });
+    </script>
+</body>
+</html>
+

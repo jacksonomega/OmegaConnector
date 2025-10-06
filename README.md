@@ -1,72 +1,197 @@
-# Omega Connector
+# Omega Bridge - Local LLM Server
 
-Omega Connector es una herramienta que facilita el uso de modelos de lenguaje locales (LLMs) mediante la integración con Ollama. Este README explica cómo preparar el entorno, instalar y usar Omega Connector para chatear con modelos instalados en tu equipo.
+Aplicación desktop que permite gestionar y ejecutar modelos LLM locales usando Ollama, con un servidor FastAPI para integración con aplicaciones web.
 
-## Requisitos
+## Características
 
-- Sistema operativo compatible (Windows, Linux, macOS).
-- Ollama instalado y configurado en la máquina local: https://ollama.com/download
-- Modelos adecuados descargados en Ollama (revisa los requisitos de cada modelo, ya que algunos requieren hardware potente).
+- 🖥️ **Interfaz gráfica con Flet**: Interfaz amigable y moderna
+- 🚀 **Servidor FastAPI**: API REST con soporte para streaming
+- 🤖 **Integración con Ollama**: Gestión completa de modelos LLM locales
+- 📊 **Consola de logs**: Monitoreo en tiempo real de solicitudes
+- 🔄 **Descarga/Eliminación de modelos**: Gestión fácil de modelos
+- 🌐 **CORS habilitado**: Listo para integración con tu web
 
-## Instalación de Ollama
+## Instalación
 
-1. Descarga Ollama desde su sitio oficial: https://ollama.com/download
-2. Instala y ejecuta la aplicación.
-3. Verifica que Ollama está en funcionamiento y que has descargado al menos un modelo compatible con tu hardware.
+1. **Instalar Ollama**:
+   - Descarga e instala Ollama desde: https://ollama.ai
+   - Asegúrate de que Ollama esté en ejecución
 
-> Una vez iniciado Ollama verás su interfaz y podrás gestionar modelos que se descargan en tu máquina.
-> 
-![img_1.png](img_1.png)
-## Configuración y uso de Omega Connector
+2. **Instalar dependencias de Python**:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-1. Descarga y ejecuta el instalador que se incluye en este repositorio.
+## Uso
 
+1. **Ejecutar la aplicación**:
+   ```bash
+   python main.py
+   ```
 
+2. **Gestionar modelos**:
+   - Selecciona un modelo del dropdown
+   - Haz clic en "Descargar Modelo" para instalarlo
+   - Una vez instalado, puedes eliminarlo con "Eliminar Modelo"
 
-![img_2.png](img_2.png)
+3. **Iniciar el servidor**:
+   - Haz clic en "Iniciar Servidor"
+   - El servidor estará disponible en `http://localhost:8000`
 
-2. Abre la aplicación y pulsa "Iniciar Servidor" para levantar el backend.
+## API Endpoints
 
-![img_3.png](img_3.png)
+### `GET /`
+Health check del servidor.
 
-3. Accede a la interfaz web "Omega Knowledge" desde tu navegador.
-4. En la sección de chat selecciona el modelo que coincida con el instalado en Ollama.
+### `GET /models`
+Obtiene la lista de modelos instalados.
 
-![img_4.png](img_4.png)
+```json
+{
+  "installed_models": ["llama3.2:3b", "mistral:7b"],
+  "current_model": "llama3.2:3b"
+}
+```
 
-En los "Logs del Sistema" se registrarán las solicitudes que Omega Connector envía a Ollama, lo que te ayudará a depurar problemas.
+### `POST /chat`
+Realiza una consulta al modelo LLM.
 
-## Solución de problemas
+**Request:**
+```json
+{
+  "model": "llama3.2:3b",
+  "prompt": "¿Qué es la inteligencia artificial?",
+  "stream": true
+}
+```
 
-Si no puedes chatear con los modelos, prueba lo siguiente:
+**Response (streaming):**
+```
+data: {"chunk": "La "}
+data: {"chunk": "inteligencia "}
+data: {"chunk": "artificial..."}
+data: [DONE]
+```
 
-- Actualiza o recarga la página web.
-- Asegúrate de que el servidor (Omega Connector) está iniciado.
-- Confirma que el modelo seleccionado en la UI coincide con uno instalado en Ollama.
-- Revisa los logs para ver errores de conexión o mensajes de Ollama.
+### `POST /set-model`
+Cambia el modelo activo.
 
-## Notas sobre rendimiento
+**Request:**
+```json
+{
+  "model": "mistral:7b"
+}
+```
 
-Los modelos locales pueden requerir muchos recursos computacionales (CPU/GPU y memoria). Antes de usar modelos grandes, revisa los requisitos del modelo y la capacidad de tu equipo.
+## Integración con tu Web
 
-# Usando IA sin ejecutar en local
+Desde `omega-knowledge.dev`, puedes hacer solicitudes al servidor:
 
-## Alternativa Groq Chat Model
+### Ejemplo con JavaScript (Streaming):
 
-Accede al sitio oficial de groq: https://console.groq.com/home. 
+```javascript
+async function askQuestion(prompt, model = "llama3.2:3b") {
+  const response = await fetch('http://localhost:8000/chat', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: model,
+      prompt: prompt,
+      stream: true
+    })
+  });
 
-Sigue las siguientes instrucciones:
-1. Crea una cuenta
-2. Inicia sesión
-3. Accede a la sección de: "Api Keys"
-4. Crea una nueva API Key y copiála!
-5. Dirígete a Omega Knowledge
-6. En sidebar del chat selecciona el modo online, no local
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
 
-7. Entra a "Configuración"
-![img.png](img.png)
-8. Pega la api key
-![img_5.png](img_5.png)
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    
+    const chunk = decoder.decode(value);
+    const lines = chunk.split('\n');
+    
+    for (const line of lines) {
+      if (line.startsWith('data: ')) {
+        const data = line.slice(6);
+        if (data === '[DONE]') {
+          console.log('Streaming completado');
+          return;
+        }
+        
+        try {
+          const parsed = JSON.parse(data);
+          console.log(parsed.chunk); // Procesar cada fragmento
+        } catch (e) {
+          // Ignorar líneas malformadas
+        }
+      }
+    }
+  }
+}
 
-### Limitaciones
-A diferencia de la opción local, Groq Chat Model tiene limitaciones en cuanto a la cantidad de tokens que puedes usar por día. Revisa los detalles en el sitio oficial de Groq para entender las restricciones y costos asociados.
+// Uso
+askQuestion("Explícame qué es React");
+```
+
+### Ejemplo con fetch (Sin streaming):
+
+```javascript
+async function askQuestionNoStream(prompt, model = "llama3.2:3b") {
+  const response = await fetch('http://localhost:8000/chat', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: model,
+      prompt: prompt,
+      stream: false
+    })
+  });
+
+  const data = await response.json();
+  return data.response;
+}
+```
+
+## Modelos Disponibles
+
+- llama3.2:3b (3B parámetros)
+- llama3.2:1b (1B parámetros)
+- llama3.1:8b (8B parámetros)
+- mistral:7b (7B parámetros)
+- phi3:mini
+- gemma2:2b (2B parámetros)
+- qwen2.5:7b (7B parámetros)
+- codellama:7b (especializado en código)
+
+## Notas de Seguridad
+
+- En producción, configura CORS específicamente para tu dominio en lugar de `allow_origins=["*"]`
+- Considera agregar autenticación si el servidor estará expuesto públicamente
+- Los modelos se ejecutan localmente, manteniendo tu privacidad
+
+## Requisitos del Sistema
+
+- Python 3.8+
+- Ollama instalado y en ejecución
+- 8GB+ RAM (dependiendo del modelo)
+- Espacio en disco para modelos (1-7GB por modelo)
+
+## Troubleshooting
+
+**Error: "Connection refused"**
+- Asegúrate de que Ollama esté en ejecución
+- Verifica que no haya otro servicio en el puerto 8000
+
+**Error al descargar modelos**
+- Verifica tu conexión a internet
+- Asegúrate de tener suficiente espacio en disco
+
+**El servidor no inicia**
+- Verifica que el puerto 8000 no esté en uso
+- Revisa los logs en la consola de la aplicación
+
