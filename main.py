@@ -72,17 +72,15 @@ class Colors:
 
 # Modelos disponibles para descargar
 AVAILABLE_MODELS = [
-    "llama3.2:3b",
-    "llama3.2:1b",
-    "llama3.1:8b",
-    "mistral:7b",
-    "phi3:mini",
-    "gemma2:2b",
-    "qwen2.5:7b",
-    "codellama:7b",
+    "qwen3:4b",
+    "qwen3:8b",
+    "qwen3:30b",
     "gemma3:1b",
     "gemma3:4b",
-    "gpt-oss:20b"
+    "gemma3:12b",
+    "gemma3:27b",
+    "gpt-oss:20b",
+    "gpt-oss:120b",
 ]
 
 
@@ -248,11 +246,11 @@ class FastAPIServer:
     """Servidor FastAPI para manejar solicitudes"""
 
     def __init__(self, log_callback=None):
-        self.app = FastAPI(title="Omega Bridge API")
+        self.app = FastAPI(title="Omega Connector API")
         self.log_callback = log_callback
         self.server = None
         self.thread = None
-        self.current_model = "llama3.2:3b"
+        self.current_model = "qwen3:4b"
 
         # Configurar CORS para permitir solicitudes desde tu web
         self.app.add_middleware(
