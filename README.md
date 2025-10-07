@@ -1,197 +1,203 @@
-# Omega Bridge - Local LLM Server
+# 🚀 Omega Bridge - Gestor de Modelos de Inteligencia Artificial
 
-Aplicación desktop que permite gestionar y ejecutar modelos LLM locales usando Ollama, con un servidor FastAPI para integración con aplicaciones web.
+**Omega Bridge** es una aplicación que te permite gestionar modelos de inteligencia artificial en tu computadora de forma sencilla. Con una interfaz moderna y fácil de usar, puedes descargar, instalar y usar diferentes modelos de IA sin necesidad de conocimientos técnicos.
 
-## Características
+## ¿Qué hace esta aplicación?
 
-- 🖥️ **Interfaz gráfica con Flet**: Interfaz amigable y moderna
-- 🚀 **Servidor FastAPI**: API REST con soporte para streaming
-- 🤖 **Integración con Ollama**: Gestión completa de modelos LLM locales
-- 📊 **Consola de logs**: Monitoreo en tiempo real de solicitudes
-- 🔄 **Descarga/Eliminación de modelos**: Gestión fácil de modelos
-- 🌐 **CORS habilitado**: Listo para integración con tu web
+Omega Bridge actúa como un **puente** entre tu computadora y los modelos de inteligencia artificial. Te permite:
 
-## Instalación
+- 📥 **Descargar modelos de IA** desde internet
+- 🗑️ **Eliminar modelos** que ya no necesites
+- 🖥️ **Gestionar modelos** con una interfaz visual
+- 🌐 **Crear un servidor local** para que otras aplicaciones puedan usar los modelos
+- 📊 **Monitorear el progreso** de las descargas y operaciones
 
-1. **Instalar Ollama**:
-   - Descarga e instala Ollama desde: https://ollama.ai
-   - Asegúrate de que Ollama esté en ejecución
+## 🤖 ¿Qué son los Modelos de IA?
 
-2. **Instalar dependencias de Python**:
-   ```bash
-   pip install -r requirements.txt
-   ```
+Los modelos de inteligencia artificial son como "cerebros digitales" que pueden:
+- Responder preguntas
+- Escribir textos
+- Mantener conversaciones
+- Ayudar con tareas de escritura
+- Analizar información
 
-## Uso
+Omega Bridge incluye varios modelos con diferentes capacidades:
 
-1. **Ejecutar la aplicación**:
-   ```bash
-   python main.py
-   ```
+### Modelos Disponibles
 
-2. **Gestionar modelos**:
-   - Selecciona un modelo del dropdown
-   - Haz clic en "Descargar Modelo" para instalarlo
-   - Una vez instalado, puedes eliminarlo con "Eliminar Modelo"
+**🔹 Modelos Qwen (Recomendados para principiantes)**
+- **Qwen 4B**: Modelo pequeño y rápido (4GB aproximadamente)
+- **Qwen 8B**: Modelo equilibrado entre velocidad y calidad (8GB aproximadamente)
+- **Qwen 30B**: Modelo grande y potente (30GB aproximadamente)
 
-3. **Iniciar el servidor**:
-   - Haz clic en "Iniciar Servidor"
-   - El servidor estará disponible en `http://localhost:8000`
+**🔹 Modelos Gemma (Eficientes)**
+- **Gemma 1B**: Muy pequeño y rápido (1GB aproximadamente)
+- **Gemma 4B**: Pequeño pero capaz (4GB aproximadamente)
+- **Gemma 12B**: Modelo mediano con buena calidad (12GB aproximadamente)
+- **Gemma 27B**: Modelo grande y avanzado (27GB aproximadamente)
 
-## API Endpoints
+**🔹 Modelos GPT-OSS (Avanzados)**
+- **GPT-OSS 20B**: Modelo muy grande (20GB aproximadamente)
+- **GPT-OSS 120B**: Modelo extremadamente grande (120GB aproximadamente)
 
-### `GET /`
-Health check del servidor.
+## 💻 Requisitos de tu Computadora
 
-### `GET /models`
-Obtiene la lista de modelos instalados.
+### Requisitos Mínimos
+- **Sistema Operativo**: Windows 10 o superior
+- **Memoria RAM**: 8 GB mínimo (16 GB recomendado)
+- **Espacio en Disco**: 20 GB libres
+- **Conexión a Internet**: Para descargar modelos
 
-```json
-{
-  "installed_models": ["llama3.2:3b", "mistral:7b"],
-  "current_model": "llama3.2:3b"
-}
-```
+### Requisitos por Modelo
+- **Modelos pequeños (1B-4B)**: 8 GB de RAM
+- **Modelos medianos (8B-12B)**: 16 GB de RAM
+- **Modelos grandes (20B+)**: 32 GB de RAM o más
 
-### `POST /chat`
-Realiza una consulta al modelo LLM.
+**💡 Recomendación**: Si eres nuevo, comienza con **Qwen 4B** o **Gemma 4B** que funcionan bien en la mayoría de computadoras.
 
-**Request:**
-```json
-{
-  "model": "llama3.2:3b",
-  "prompt": "¿Qué es la inteligencia artificial?",
-  "stream": true
-}
-```
+## 🚀 Cómo Usar Omega Bridge
 
-**Response (streaming):**
-```
-data: {"chunk": "La "}
-data: {"chunk": "inteligencia "}
-data: {"chunk": "artificial..."}
-data: [DONE]
-```
+### Paso 1: Abrir la Aplicación
+1. Ejecuta el archivo `OmegaBridge.exe` (si tienes el ejecutable)
+2. O ejecuta `python main.py` (si tienes el código fuente)
+3. Se abrirá una ventana con la interfaz de la aplicación
 
-### `POST /set-model`
-Cambia el modelo activo.
+### Paso 2: Entender la Interfaz
 
-**Request:**
-```json
-{
-  "model": "mistral:7b"
-}
-```
+La aplicación tiene **3 secciones principales**:
 
-## Integración con tu Web
+#### 🎛️ Control del Servidor (Arriba izquierda)
+- **Indicador de Estado**: Un círculo que muestra si el servidor está activo
+  - 🔴 Rojo = Apagado
+  - 🟢 Verde = Funcionando
+- **Botón de Control**: Para encender/apagar el servidor
+- **URL del Servidor**: Dirección donde otras aplicaciones pueden conectarse
 
-Desde `omega-knowledge.dev`, puedes hacer solicitudes al servidor:
+#### 🤖 Gestión de Modelos (Arriba derecha)
+- **Lista de Modelos**: Menú para seleccionar qué modelo quieres usar
+- **Estado del Modelo**: Te dice si el modelo está instalado o necesita descarga
+- **Botón Descargar**: Para descargar el modelo seleccionado
+- **Botón Eliminar**: Para borrar modelos que ya no uses
+- **Barra de Progreso**: Muestra el avance de las descargas
 
-### Ejemplo con JavaScript (Streaming):
+#### 📋 Consola de Información (Abajo)
+- **Registro de Actividad**: Muestra todo lo que está pasando
+- **Botón Limpiar**: Para borrar el historial de mensajes
 
-```javascript
-async function askQuestion(prompt, model = "llama3.2:3b") {
-  const response = await fetch('http://localhost:8000/chat', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: model,
-      prompt: prompt,
-      stream: true
-    })
-  });
+## 📥 Cómo Descargar un Modelo
 
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
+1. **Selecciona un Modelo**: Haz clic en el menú desplegable y elige un modelo
+2. **Verifica el Estado**: Si dice "necesita ser descargado", continúa
+3. **Haz Clic en Descargar**: Presiona el botón azul "Descargar"
+4. **Espera la Descarga**: 
+   - Verás una barra de progreso
+   - En la consola aparecerán mensajes de descarga
+   - Puede tomar varios minutos dependiendo del tamaño del modelo
+5. **Descarga Completa**: Cuando termine, el estado cambiará a "instalado y listo"
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    
-    const chunk = decoder.decode(value);
-    const lines = chunk.split('\n');
-    
-    for (const line of lines) {
-      if (line.startsWith('data: ')) {
-        const data = line.slice(6);
-        if (data === '[DONE]') {
-          console.log('Streaming completado');
-          return;
-        }
-        
-        try {
-          const parsed = JSON.parse(data);
-          console.log(parsed.chunk); // Procesar cada fragmento
-        } catch (e) {
-          // Ignorar líneas malformadas
-        }
-      }
-    }
-  }
-}
+## 🗑️ Cómo Eliminar un Modelo
 
-// Uso
-askQuestion("Explícame qué es React");
-```
+1. **Selecciona el Modelo**: Elige un modelo que ya esté instalado
+2. **Haz Clic en Eliminar**: Presiona el botón rojo "Eliminar"
+3. **Confirma la Eliminación**: Aparecerá una ventana preguntando si estás seguro
+4. **Confirma**: Haz clic en "Eliminar" para confirmar
+5. **Modelo Eliminado**: El espacio en disco se liberará
 
-### Ejemplo con fetch (Sin streaming):
+## 🌐 Cómo Iniciar el Servidor
 
-```javascript
-async function askQuestionNoStream(prompt, model = "llama3.2:3b") {
-  const response = await fetch('http://localhost:8000/chat', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: model,
-      prompt: prompt,
-      stream: false
-    })
-  });
+1. **Asegúrate de Tener un Modelo**: Descarga al menos un modelo primero
+2. **Haz Clic en "Iniciar Servidor"**: Botón verde en la sección de control
+3. **Servidor Activo**: El indicador se pondrá verde y dirá "ONLINE"
+4. **Listo para Usar**: Otras aplicaciones ya pueden conectarse al servidor
 
-  const data = await response.json();
-  return data.response;
-}
-```
+Para **detener el servidor**:
+- Haz clic en "Detener Servidor" (botón rojo)
+- El indicador se pondrá rojo y dirá "OFFLINE"
 
-## Modelos Disponibles
+## 📊 Qué Muestra la Consola
 
-- llama3.2:3b (3B parámetros)
-- llama3.2:1b (1B parámetros)
-- llama3.1:8b (8B parámetros)
-- mistral:7b (7B parámetros)
-- phi3:mini
-- gemma2:2b (2B parámetros)
-- qwen2.5:7b (7B parámetros)
-- codellama:7b (especializado en código)
+La consola de información te muestra en tiempo real:
 
-## Notas de Seguridad
+### Mensajes de Inicio
+- `🚀 Aplicación Omega Bridge iniciada`
+- `📊 Interfaz moderna cargada correctamente`
 
-- En producción, configura CORS específicamente para tu dominio en lugar de `allow_origins=["*"]`
-- Considera agregar autenticación si el servidor estará expuesto públicamente
-- Los modelos se ejecutan localmente, manteniendo tu privacidad
+### Durante Descargas
+- `Descargando qwen3:4b...`
+- `pulling manifest`
+- `downloading sha256:abc123...`
+- `verifying sha256:abc123...`
+- `✅ Modelo descargado exitosamente`
 
-## Requisitos del Sistema
+### Control del Servidor
+- `✅ Servidor FastAPI iniciado en http://0.0.0.0:5123`
+- `⏹️ Servidor detenido`
 
-- Python 3.8+
-- Ollama instalado y en ejecución
-- 8GB+ RAM (dependiendo del modelo)
-- Espacio en disco para modelos (1-7GB por modelo)
+### Errores Comunes
+- `❌ Error: No se encuentra ollama`
+- `❌ Error al conectar con el servidor`
+- `❌ Modelo no encontrado`
 
-## Troubleshooting
+### Actividad del Servidor
+- `GET /api/health-check - Health check`
+- `POST /api/chat - Model: qwen3:4b, Prompt: Hola...`
 
-**Error: "Connection refused"**
-- Asegúrate de que Ollama esté en ejecución
-- Verifica que no haya otro servicio en el puerto 8000
+## 🔧 Consejos y Recomendaciones
 
-**Error al descargar modelos**
-- Verifica tu conexión a internet
-- Asegúrate de tener suficiente espacio en disco
+### Para Principiantes
+1. **Comienza con modelos pequeños** (Qwen 4B o Gemma 4B)
+2. **Descarga solo un modelo al principio** para probar
+3. **Mantén la aplicación abierta** mientras uses los modelos
+4. **Revisa la consola** si algo no funciona
 
-**El servidor no inicia**
-- Verifica que el puerto 8000 no esté en uso
-- Revisa los logs en la consola de la aplicación
+### Gestión de Espacio
+- **Elimina modelos que no uses** para liberar espacio
+- **Los modelos grandes pueden ocupar muchos GB**
+- **Puedes tener varios modelos instalados** al mismo tiempo
 
+### Rendimiento
+- **Modelos más grandes = mejor calidad pero más lento**
+- **Modelos más pequeños = más rápido pero menos capaz**
+- **Cierra otros programas pesados** al usar modelos grandes
+
+## ❓ Problemas Comunes
+
+### "No se encuentra ollama"
+- **Problema**: Falta instalar Ollama
+- **Solución**: Descarga e instala Ollama desde https://ollama.ai/download
+
+### "Error al iniciar servidor"
+- **Problema**: Puerto ocupado o permisos
+- **Solución**: Reinicia la aplicación o tu computadora
+
+### "Descarga muy lenta"
+- **Problema**: Conexión lenta a internet
+- **Solución**: Ten paciencia, los modelos son archivos grandes
+
+### "No tengo suficiente RAM"
+- **Problema**: Modelo muy grande para tu computadora
+- **Solución**: Usa un modelo más pequeño (1B o 4B)
+
+## 🎯 Flujo de Trabajo Recomendado
+
+1. **Primera Vez**:
+   - Abre la aplicación
+   - Selecciona "Qwen 4B" o "Gemma 4B"
+   - Descarga el modelo
+   - Inicia el servidor
+
+2. **Uso Regular**:
+   - Abre la aplicación
+   - Inicia el servidor
+   - Usa tu aplicación web favorita que se conecte al servidor
+
+3. **Mantenimiento**:
+   - Elimina modelos que no uses
+   - Prueba modelos nuevos según tus necesidades
+   - Revisa la consola si hay problemas
+
+---
+
+**¡Disfruta usando Omega Bridge!** 🎉
+
+*Si necesitas ayuda adicional, revisa los mensajes en la consola de la aplicación para obtener más información sobre lo que está sucediendo.*
